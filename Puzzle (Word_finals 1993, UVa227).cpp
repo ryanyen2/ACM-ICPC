@@ -1,26 +1,12 @@
 #include <iostream>
-#include <vector>
 #include <string>
-#include <regex>
-#include <cmath>
-#include <map>
-#include <algorithm>
-#include <cstring>
-#include <iomanip>
-#include <set>
 using namespace std;
 
 #define _for(i, a, b) for (int i = (a); i<(b); ++i)
 #define _rep(i, a, b) for (int i = (a); i <= (b); i++)
 
-template<typename T>
-ostream& operator<<(ostream& os, const vector<T>& v) {
-	_for(i, 0, v.size()) os << v[i] << " ";
-	return os;
-}
-
 string instruction;
-string strs[5];
+string strs[5];			// !!!!!!!! IMPORTANT 
 void get_input(){
 	// get origin matrics
 	_for(i, 0, 5) {
@@ -30,6 +16,7 @@ void get_input(){
 	getline(cin, instruction);
 }
 
+// get the blank coordenation
 int obx = 0, oby = 0;
 void find_blank() {
 	_for(x, 0, 5) {
@@ -48,7 +35,7 @@ int main() {
 	get_input();
 	
 	_for(i, 0, instruction.size()) {
-		find_blank();
+		find_blank();	// renew the blank position
 		if (instruction[i] == 'A') {
 			strs[obx][oby] = strs[obx - 1][oby];
 			strs[obx - 1][oby] = ' ';
@@ -68,6 +55,7 @@ int main() {
 		else break;
 	}
 
+	// output the answer
 	_for(x, 0, 5) {
 		_for(y, 0, 5) {
 			cout << strs[x][y] << ' ';
