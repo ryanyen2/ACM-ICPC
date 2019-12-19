@@ -41,3 +41,43 @@ int main() {
 
 	return 0;
 }
+
+
+
+//Another answer
+#include <iostream>
+#include <vector>
+#include <string>
+using namespace std;
+
+#define _for(i, a, b) for (int i = (a); i<(b); ++i)
+
+int main() {
+
+	int testcase;
+	int n, m;
+	char DNA[64][1024];
+	cin >> testcase;
+	while (testcase--) {
+		cin >> n >> m;
+		for (int i = 0; i < n; i++)
+			cin >> DNA[i];
+		int final_dis = 0;
+		char final_ans[1024] = {}, index[] = "ACGT";
+		_for(i, 0, m) {
+			int cnt[4] = {}, max = 0;
+			_for(j, 0, n)
+				cnt[find(index, index + 4, DNA[j][i]) - index]++;
+
+			_for(j, 0, 4) {
+				if (cnt[j] > cnt[max])
+					max = j;
+			}
+			final_ans[i] = index[max], final_dis += n - cnt[max];
+
+		}
+		printf("%s\n%d\n", final_ans, final_dis);
+	}
+	return 0;
+}
+
