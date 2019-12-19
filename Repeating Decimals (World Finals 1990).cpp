@@ -26,8 +26,8 @@ int main() {
 			remain.push_back(a);
 
 			for (i = 0; i < remain.size(); i++) 
-				if (answer[i] == q) {
-					if (remain[i-1] == a) {
+				if (answer[i] == q) 
+					if (remain[i-1] == a) 
 						bre = false;
 		
 		if (a == 0) {
