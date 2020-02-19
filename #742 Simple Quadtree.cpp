@@ -12,12 +12,12 @@ ostream& operator<<(ostream& os, const vector<T>& v) {
 	return os;
 }
 
-int numOfNodes(vector< vector<int> >& board, int x, int y, int size) {
-	if (size == 0) return 1;
+int count_nodes(vector< vector<char> >& grid, int x, int y, int len) {
+	if (len == '0') return 1;
 	bool same = true;
-	for (int i = x; i < x + pow(2, size); i++) {
-		for (int j = y; j < y + pow(2, size); j++) {
-			if (board[i][j] != board[x][y]) {
+	for (int i = x; i < x + pow(2, len); i++) {
+		for (int j = y; j < y + pow(2, len); j++) {
+			if (grid[i][j] != grid[x][y]) {
 				same = false;
 				goto outside;
 			}
@@ -26,10 +26,10 @@ int numOfNodes(vector< vector<int> >& board, int x, int y, int size) {
 outside:
 	if (same) return 1;
 	else {
-		return 1 + numOfNodes(board, x, y, size - 1)
-			+ numOfNodes(board, x + pow(2, size - 1), y, size - 1)
-			+ numOfNodes(board, x, y + pow(2, size - 1), size - 1)
-			+ numOfNodes(board, x + pow(2, size - 1), y + pow(2, size - 1), size - 1);
+		return 1 + count_nodes(grid, x, y, len - 1)
+			+ count_nodes(grid, x + pow(2, len - 1), y, len - 1)
+			+ count_nodes(grid, x, y + pow(2, len - 1), len - 1)
+			+ count_nodes(grid, x + pow(2, len - 1), y + pow(2, len - 1), len - 1);
 	}
 }
 
@@ -39,18 +39,15 @@ int main() {
 
 	while (cin >> k) {
 		
-		vector< vector<int> > grid;
-		for (int i = 0; i < pow(2, k); i++) {
-			vector<int> temp;
-			grid.push_back(temp);
+		int len = pow(2, k);
+		vector <vector<char>> grid(len, vector<char>(len));
+		// get user input
+		_for(i, 0,len) {
+			_for(j, 0, len)
+				cin >> grid[i][j];
 		}
 
-		for (int i = 0; i < grid.size(); i++) {
-			cin >> line;
-			for (int j = 0; j < line.length(); j++) {
-				grid[i].push_back(int(line[j]) - 48);
-			}
-		}
-		cout << numOfNodes(grid, 0, 0, k) << endl;
+		cout << count_nodes(grid, 0, 0, k) << endl;
 	}
+	return 0;
 }
