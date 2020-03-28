@@ -1,79 +1,83 @@
 #include <iostream>
 #include<algorithm>
-#include <vector>
-#include <string>
-#include <cstring>
-#include <iterator>
-#include <cstdio>
-#include <stack>
-#include <functional>
-#include <queue>
-#include <list>
-#include <map>
-#include <unordered_map>
 using namespace std;
 #define _for(i, a, b) for (int i = (a); i<(b); ++i)
 #define _rep(i, a, b) for (int i = (a); i <= (b); i++)
-template<typename T>
-ostream& operator<<(ostream& os, const vector<T>& v) {
-	_for(i, 0, v.size()) {
-		os << v[i].data << " " ;
-		cout << v[i].index << " " <<endl;
-	}
-	return os;
-}
-typedef long long int ll;
 
-struct str {
-	int index;
+class Node {
+public:
 	int data;
+	Node* next;
+	Node(int d) { data = d; }
+};
+
+class List {
+public:
+	Node* first;
+	List(Node* n) { first = n; }
 };
 
 int main() {
-	int n, op_n, d, op1, op2, op3;
-	cin >> n;
-	str* temp = new str;
-	vector <str> vc;
-	_for(i, 0, n) {
-		cin >> d;
-		temp->data = d;
-		temp->index = i;
-		vc.push_back(*temp);
+	int n, data;
+	cin >> n >> data;
+	Node* p, * current = NULL, *ref;
+	p = new Node(data);
+	ref = p;
+	List myList(p);
+	for (int i = 1; i < n; i++) {
+		cin >> data;
+		current = new Node(data);
+		p->next = current;
+		p = current;
 	}
-	cin >> op_n;
-	int curr_index = 0;
-	_for(i, 0, op_n) {
-		str* temp = new str;
-		cin >> op1;
-		switch (op1) {
+	current->next = ref;
+	int op;
+	int num_of_op;
+	cin >> num_of_op;
+	for (int i = 0; i < num_of_op; i++) {
+		cin >> op;
+		switch (op) {
 		case 1:
-			cin >> op2 >> op3;
-			curr_index = (curr_index + op2 - 1) % n;
-			temp->data = op3;
-			temp->index = curr_index + 1;
-			vc.insert(vc.begin() + curr_index + 1, *temp);
-			curr_index++; n++;
-			_for(j, curr_index + 1, n)
-				vc[j].index++;
+			int j, d;
+			cin >> j >> d;
+			current = ref;
+			_for(k, 0, j) {
+				p = current;
+				current = current->next;
+			}
+			p->next = new Node(d);
+			ref = p->next;
+			p->next->next = current;
 			break;
-		case 2: 
-			cin >> op2;
-			curr_index = (curr_index + op2 - 1) % n;
-			n--;
-			_for(j, curr_index, n) {
-				vc[j] = vc[j + 1];
-				vc[j].index--;
+		case 2:
+			cin >> j;
+			if (j == 1) {
+				p = ref->next;
+				while (p->next != ref) p = p->next;
+				current = ref->next;
+				p->next = current;
+				ref = current;
+			}
+			else {
+				p = ref;
+				current = ref->next->next;
+				_for(k, 0, j-2) {
+					current = current->next;
+					p = p->next;
+				}
+				p->next = current;
+				ref = current;
 			}
 			break;
-		case 3: 
-			cin >> op2;
-			curr_index = (curr_index + op2 - 1) % n;
-			cout << vc[curr_index].data << endl;
-			break;
+		case 3:
+			cin >> j;
+			p = ref;
+			_for(k, 0, j-1) {
+				p = p->next;
+			}
+			cout << p->data << endl;
+			ref = p;
 		}
-
-		//cout << "curr " << curr_index << endl;
 	}
-
 	return 0;
 }
