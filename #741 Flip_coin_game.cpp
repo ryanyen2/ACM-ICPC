@@ -1,118 +1,128 @@
 #include <iostream>
-#include<algorithm>
-#include <vector>
 #include <string>
-#include <iterator>
 using namespace std;
-#define _for(i, a, b) for (int i = (a); i<(b); ++i)
-#define _rep(i, a, b) for (int i = (a); i <= (b); i++)
-template<typename T>
-ostream& operator<<(ostream& os, const vector<T>& v) {
-	_for(i, 0, v.size()) os << v[i] << " ";
-	return os;
-}
 
-// flip row
-vector<vector<char>> flip_row(int col, int location, vector<vector<char>> grid){
+int pow(int base, int exp);
 
-	_for(j, 0, col) {
-		if (grid[location][j] == '0') grid[location][j] = '1';
-		else grid[location][j] = '0';
+void reset(int** resetee, int** reseter, int rows, int columns);
+
+int numOfBiDigits(int num);
+
+int getIthBiDigit(int num, int i);
+
+void flipJthColumn(int j, int** board, int rows) {
+	for (int i = 0; i < rows; i++) {
+		board[i][j] == 0 ? board[i][j] = 1 : board[i][j] = 0;
 	}
-	return grid;
-}
-// flip column
-vector<vector<char>> flip_col(int row, int location, vector<vector<char>> grid) {
-	_for(j, 0, row) {
-		if (grid[j][location] == '0') grid[j][location] = '1';
-		else grid[j][location] = '0';
-	}
-	return grid;
 }
 
-// use an array to check whether 1>0 -> dnt need flip
-// if 1 == 0 -> flip if the head is 0
-vector<int>renew_row_sum(int row, vector<int>row_sum, vector<vector<char>>grid) {
-	_for(i, 0, row) {
-		int zero_cnt = count(grid[i].begin(), grid[i].end(), '0');
-		int one_cnt =  count(grid[i].begin(), grid[i].end(), '1');
-		row_sum.push_back(one_cnt - zero_cnt);
+void flipIthRow(int i, int** board, int columns) {
+	for (int j = 0; j < columns; j++) {
+		board[i][j] == 0 ? board[i][j] = 1 : board[i][j] = 0;
 	}
-	//cout << "row_sum: " << row_sum << endl;
-	return row_sum;
 }
-vector<int>renew_col_sum(int row, int col, vector<int>col_sum, vector<vector<char>>grid) {
 
-	_for(i, 0, col) {
-		int col_amount = 0;
-		_for(j, 0, row) {
-			if (grid[j][i] == '0') col_amount++;
+void flipColumns(int** board, int rows, int columns) {
+	for (int i = 1; i < rows; i++) {
+		int counter0 = 0, counter1 = 0;
+		for (int j = 0; j < columns; j++) {
+			board[i][j] == 0 ? counter0++ : counter1++;
 		}
-		col_sum.push_back((row - col_amount) - col_amount);		// >0 -> 1's amount > 0
+		if (counter0 > counter1) flipIthRow(i, board, columns);
 	}
-	//cout << "col_sum: " << col_sum << endl;
-	return col_sum;
 }
 
-bool terminate(int row,int col, vector<int>row_sum, vector<int>col_sum) {
-	_for(i, 0, row)
-		if (row_sum[i] < 0) return false;
-	_for(i, 0, col)
-		if (col_sum[i] < 0) return false;
-	return true;
-
-}
-bool first(int row, int col, vector<int>row_sum, vector<int> col_sum, vector<vector<char>>grid) {
-	int rs = 0, cs = 0;
-	_for(i, 0, row) if (row_sum[i] < rs) rs = row_sum[i];
-	_for(i, 0, col) if (col_sum[i] < cs) cs = col_sum[i];
-	return (rs < cs);	// true = row first
+int counts1(int** board, int rows, int columns) {
+	
+	int ans = 0;
+	for (int j = 0; j < columns; j++) {
+		if (board[0][j] == 1) ans++;
+	}
+	for (int i = 1; i < rows; i++) {
+		int counter0 = 0, counter1 = 0;
+		for (int j = 0; j < columns; j++) {
+			board[i][j] == 0 ? counter0++ : counter1++;
+		}
+		counter1 > counter0 ? ans += counter1 : ans += counter0;
+	}
+	return ans;
 }
 
 int main() {
-
-	int row, col;
+	int row, col, max_cnt;
 	while (cin >> row >> col) {
-		vector <vector<char>> grid(row, vector<char>(col));
-		int ans = 0;
-		// get user input
-		_for(i, 0, row) {
-			_for(j, 0, col)
-				cin >> grid[i][j];
-		}
-		// renew the row and col sum (<0 -> flip)
-		vector <int> row_sum;
-		vector<int> col_sum;
-		row_sum = renew_row_sum(row, row_sum, grid);
-		col_sum = renew_col_sum(row, col, col_sum, grid);
-		do {
-			if (first(row, col, row_sum, col_sum, grid)) goto row;
-			else goto col;
-		row:_for(i, 0, row) {
-				if (row_sum[i] < 0 || (row_sum[i] == 0 && grid[i][0] == '0'))
-					grid = flip_row(col, i, grid);
-			
-			}
-		col:_for(i, 0, col) {
-				if (col_sum[i] < 0 || (col_sum[i] == 0 && grid[0][i] == '0'))
-					grid = flip_col(row, i, grid);
-			}
-			row_sum.clear();
-			col_sum.clear();
-			row_sum = renew_row_sum(row, row_sum, grid);
-			col_sum = renew_col_sum(row, col, col_sum, grid);
+		max_cnt = 0;
+		int counter = pow(2, col) - 1;
 
-			//_for(i, 0, row) cout << grid[i] << endl;
-			//cout << "----------------------" << endl;
-		} while ((terminate(row, col, row_sum, col_sum)) == false);
-
-
-		// count answer
-		_for(i, 0, row)
-			ans += count(grid[i].begin(), grid[i].end(), '1');
-		cout << ans << endl;
 		
-		// _for(i, 0, row) cout << grid[i] << endl;		print grid
+		int** grid = new int* [row];
+		for (int i = 0; i < row; i++) {
+			grid[i] = new int[col];
+		}
+
+		string line;
+		for (int i = 0; i < row; i++) {
+			cin >> line;
+			for (int j = 0; j < line.length(); j++) {
+				grid[i][j] = int(line[j] - 48);
+			}
+		}
+
+		
+		int** temp = new int* [row];
+		for (int i = 0; i < row; i++) {
+			temp[i] = new int[col];
+			for (int j = 0; j < col; j++) {
+				temp[i][j] = grid[i][j];
+			}
+		}
+
+		while (counter >= 0) {
+
+			for (int j = 0; j < col; j++) {
+				if (getIthBiDigit(counter, col - j - 1) == 1) {
+					flipJthColumn(j, grid, row);
+				}
+			}
+
+			//flipColumns(board, rows, columns);
+			if (counts1(grid, row, col) > max_cnt) max_cnt = counts1(grid, row, col);
+
+			reset(grid, temp, row, col);
+			counter--;
+		}
+
+		cout << max_cnt << endl;
 	}
-	return 0;
+
+}
+
+void reset(int** resetee, int** reseter, int rows, int columns) {
+	for (int i = 0; i < rows; i++) {
+		for (int j = 0; j < columns; j++) {
+			resetee[i][j] = reseter[i][j];
+		}
+	}
+}
+
+int getIthBiDigit(int num, int i) {
+	// return (num % pow(2, numOfBiDigits(num) - i) / pow(2, numOfBiDigits(num) - i - 1));
+	return num % pow(2, i + 1) / pow(2, i);
+}
+
+int pow(int base, int exp) {
+	int ans = 1;
+	for (int i = 0; i < exp; i++) {
+		ans *= base;
+	}
+	return ans;
+}
+
+int numOfBiDigits(int num) {
+	int ans = 0;
+	while (num > 0) {
+		num /= 2;
+		ans++;
+	}
+	return ans;
 }
